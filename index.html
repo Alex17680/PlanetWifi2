@@ -1,0 +1,203 @@
+
+    <!DOCTYPE html>
+    <html lang="es">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>PlanetWifi App</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <style>
+            body {
+                background-color: #2d2d2d;
+                color: black; /* Color de texto negro para todo el cuerpo */
+                position: relative;
+                overflow: hidden;
+            }
+            .hidden {
+                display: none;
+            }
+            .chat-container {
+                max-height: 300px;
+                overflow-y: auto;
+                border: 1px solid #ccc;
+                padding: 10px;
+                background-color: #444;
+            }
+            .chat-input {
+                color: black; /* Color de texto negro */
+            }
+            .watermark {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                z-index: -1;
+                opacity: 0.1; /* Opacidad de la marca de agua */
+                background-size: cover;
+                background-repeat: no-repeat;
+            }
+            .admin-label {
+                color: black; /* Color de texto negro para la sección de administrador */
+            }
+            .ad-text {
+                color: black; /* Color de texto negro para la publicidad */
+            }
+        </style>
+    </head>
+    <body class="flex flex-col items-center justify-center h-screen">
+        <div class="watermark" id="watermark"></div>
+        <h1 class="text-3xl mb-4">PlanetWifi</h1>
+        <div id="ad-container" class="flex justify-center mb-4">
+            <div id="ad1" class="ad ad-text hidden">Publicidad 1</div>
+            <div id="ad2" class="ad ad-text hidden">Publicidad 2</div>
+            <div id="ad3" class="ad ad-text hidden">Publicidad 3</div>
+            <div id="ad4" class="ad ad-text hidden">Publicidad 4</div>
+        </div>
+        <div class="mb-4">
+            <button onclick="showTechLogin()" class="bg-blue-500 px-4 py-2 rounded">Ingreso Técnicos</button>
+            <button onclick="showAdminLogin()" class="bg-green-500 px-4 py-2 rounded">Ingreso Administrador</button>
+        </div>
+        <div id="tech-login" class="hidden">
+            <input type="password" id="tech-password" placeholder="Clave Técnica" class="border p-2 mb-2" />
+            <button onclick="loginTech()" class="bg-blue-500 px-4 py-2 rounded">Ingresar</button>
+        </div>
+        <div id="admin-login" class="hidden">
+            <input type="password" id="admin-password" placeholder="Clave Administrador" class="border p-2 mb-2" />
+            <button onclick="loginAdmin()" class="bg-green-500 px-4 py-2 rounded">Ingresar</button>
+        </div>
+        <div id="tech-section" class="hidden">
+            <div class="chat-container" id="chat-container"></div>
+            <input type="text" id="chat-input" placeholder="Escribe un mensaje..." class="border p-2 mb-2 chat-input" />
+            <input type="file" id="chat-image" class="border p-2 mb-2" />
+            <button onclick="sendMessage()" class="bg-blue-500 px-4 py-2 rounded">Enviar Chat</button>
+            <button onclick="uploadChatImage()" class="bg-green-500 px-4 py-2 rounded">Subir Imagen</button>
+            <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded">Regresar</button>
+        </div>
+        <div id="admin-section" class="hidden">
+            <label class="admin-label" for="upload-option">Selecciona dónde subir la imagen:</label>
+            <select id="upload-option" class="border p-2 mb-2">
+                <option value="ad1">Publicidad 1</option>
+                <option value="ad2">Publicidad 2</option>
+                <option value="ad3">Publicidad 3</option>
+                <option value="ad4">Publicidad 4</option>
+                <option value="background">Fondo de la App</option>
+            </select>
+            <input type="file" id="ad-image" class="border p-2 mb-2" />
+            <button onclick="uploadImage()" class="bg-green-500 px-4 py-2 rounded">Subir Imagen</button>
+            <button onclick="logout()" class="bg-red-500 px-4 py-2 rounded">Regresar</button>
+        </div>
+        <script>
+            let currentAd = 0;
+            const ads = ['ad1', 'ad2', 'ad3', 'ad4'];
+            const adInterval = 10000; // 10 seconds
+
+            function showAd() {
+                ads.forEach((ad, index) => {
+                    document.getElementById(ad).classList.toggle('hidden', index !== currentAd);
+                });
+                currentAd = (currentAd + 1) % ads.length;
+            }
+
+            function startAdRotation() {
+                showAd();
+                setInterval(showAd, adInterval);
+            }
+
+            function showTechLogin() {
+                document.getElementById('tech-login').classList.remove('hidden');
+                document.getElementById('admin-login').classList.add('hidden');
+            }
+
+            function showAdminLogin() {
+                document.getElementById('admin-login').classList.remove('hidden');
+                document.getElementById('tech-login').classList.add('hidden');
+            }
+
+            function loginTech() {
+                const password = document.getElementById('tech-password').value;
+                if (password === '95956') {
+                    document.getElementById('tech-section').classList.remove('hidden');
+                    document.getElementById('tech-login').classList.add('hidden');
+                } else {
+                    alert('Clave incorrecta');
+                }
+            }
+
+            function loginAdmin() {
+                const password = document.getElementById('admin-password').value;
+                if (password === '17680') {
+                    document.getElementById('admin-section').classList.remove('hidden');
+                    document.getElementById('admin-login').classList.add('hidden');
+                } else {
+                    alert('Clave incorrecta');
+                }
+            }
+
+            function sendMessage() {
+                const message = document.getElementById('chat-input').value;
+                if (message) {
+                    const chatContainer = document.getElementById('chat-container');
+                    const messageDiv = document.createElement('div');
+                    messageDiv.classList.add('flex', 'justify-between', 'items-center', 'mb-2');
+                    messageDiv.innerHTML = `
+                        <span>${message}</span>
+                        <button onclick="deleteMessage(this)" class="bg-red-500 text-white px-2 py-1 rounded">Borrar</button>
+                    `;
+                    chatContainer.appendChild(messageDiv);
+                    document.getElementById('chat-input').value = '';
+                }
+            }
+
+            function deleteMessage(button) {
+                const messageDiv = button.parentElement;
+                messageDiv.remove();
+            }
+
+            function uploadChatImage() {
+                const fileInput = document.getElementById('chat-image');
+                if (fileInput.files.length > 0) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const chatContainer = document.getElementById('chat-container');
+                        const imageDiv = document.createElement('div');
+                        imageDiv.classList.add('flex', 'justify-between', 'items-center', 'mb-2');
+                        imageDiv.innerHTML = `
+                            <img src="${e.target.result}" alt="Imagen del chat" class="w-1/2 h-auto mb-2" />
+                            <button onclick="deleteMessage(this)" class="bg-red-500 text-white px-2 py-1 rounded">Borrar</button>
+                        `;
+                        chatContainer.appendChild(imageDiv);
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                    fileInput.value = ''; // Limpiar el input de archivo
+                }
+            }
+
+            function logout() {
+                document.getElementById('tech-section').classList.add('hidden');
+                document.getElementById('admin-section').classList.add('hidden');
+                document.getElementById('tech-login').classList.add('hidden');
+                document.getElementById('admin-login').classList.add('hidden');
+            }
+
+            function uploadImage() {
+                const fileInput = document.getElementById('ad-image');
+                const option = document.getElementById('upload-option').value;
+                
+                if (fileInput.files.length > 0) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        if (option !== 'background') {
+                            document.getElementById(option).innerHTML = `<img src="${e.target.result}" alt="Publicidad" class="w-full h-full object-cover" />`;
+                        } else {
+                            document.getElementById('watermark').style.backgroundImage = `url(${e.target.result})`;
+                        }
+                    };
+                    reader.readAsDataURL(fileInput.files[0]);
+                }
+            }
+
+            startAdRotation();
+        </script>
+    </body>
+    </html>
